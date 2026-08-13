@@ -245,12 +245,19 @@
         }
         
         th, td {
-            padding: 10px 6px; /* 減少單元格內距 */
+            padding: 10px 2px; /* 減少單元格內距 */
         }
         
         .col-item {
             padding-left: 8px; /* 品名左側內距減少 */
             font-size: 0.8rem;
+            width:90px;
+        }
+        td.col-item + td{
+            width:65px;
+        }
+        .col-weight {
+            width:20px;
         }
         
         .col-note {
@@ -260,7 +267,9 @@
             overflow: hidden;
             text-overflow: ellipsis; /* 過長備註顯示... */
         }
-        
+        .total-cell{
+            width:40px;
+        }
         .input-qty {
             width: 60px; /* 手機上輸入框更窄 */
             padding: 6px 4px;
