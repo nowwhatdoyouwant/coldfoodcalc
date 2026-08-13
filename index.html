@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>凍品重量計算器</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+        }
+        body {
+            background: #f4f7fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 24px;
+        }
+        .app-container {
+            max-width: 1200px;
+            width: 100%;
+            background: white;
+            border-radius: 28px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08), 0 8px 20px rgba(0, 0, 0, 0.06);
+            padding: 28px 24px 36px;
+            transition: all 0.2s;
+        }
+        h1 {
+            font-size: 1.9rem;
+            font-weight: 600;
+            margin: 0 0 6px 0;
+            letter-spacing: -0.3px;
+            color: #0b1a2e;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .subhead {
+            color: #4a5b6e;
+            font-size: 0.95rem;
+            margin: 0 0 28px 0;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #e9edf2;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .subhead span {
+            background: #eef2f7;
+            padding: 4px 14px;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            color: #1e3a5f;
+        }
+        .table-responsive {
+            overflow-x: auto;
+            border-radius: 18px;
+            border: 1px solid #e2e8f0;
+            background: #ffffff;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+            min-width: 700px;
+        }
+        th {
+            background: #f0f4fc;
+            color: #1c2e44;
+            font-weight: 600;
+            padding: 16px 12px;
+            text-align: center;
+            border-bottom: 2px solid #dce3ec;
+            white-space: nowrap;
+        }
+        td {
+            padding: 14px 10px;
+            border-bottom: 1px solid #eaeef4;
+            vertical-align: middle;
+            text-align: center;
+        }
+        tr:last-child td {
+            border-bottom: none;
+        }
+        .col-item {
+            text-align: left;
+            padding-left: 16px;
+            font-weight: 500;
+            color: #1f2a3e;
+        }
+        .col-note {
+            text-align: left;
+            color: #4b5a70;
+            font-size: 0.85rem;
+            max-width: 140px;
+            white-space: nowrap;
+        }
+        .col-weight {
+            font-weight: 500;
+            color: #0c1e32;
+        }
+        .col-total {
+            font-weight: 600;
+            color: #0b3b5c;
+            background: #f6faff;
+        }
+        .input-qty {
+            width: 76px;
+            padding: 10px 6px;
+            border: 1.5px solid #d7dfe9;
+            border-radius: 14px;
+            text-align: center;
+            font-size: 0.95rem;
+            font-weight: 500;
+            background: white;
+            transition: 0.15s;
+            color: #0b1e30;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.02);
+        }
+        .input-qty:focus {
+            border-color: #2a6f97;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(42, 111, 151, 0.15);
+            background: #fbfdff;
+        }
+        .input-qty:disabled {
+            background: #f2f6fc;
+            color: #3a4f66;
+            border-color: #d0dae6;
+            cursor: not-allowed;
+        }
+        .input-qty[readonly] {
+            background: #f8fafd;
+            border-style: dotted;
+            border-color: #b6c6db;
+        }
+        .qty-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 4px;
+        }
+        .total-cell {
+            font-weight: 700;
+            color: #004080;
+            background: #f3f9ff;
+            border-radius: 8px;
+            padding: 6px 4px;
+        }
+        /* .footer-stats {
+            margin-top: 28px;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 28px;
+            flex-wrap: wrap;
+            background: #f8faff;
+            padding: 16px 24px;
+            border-radius: 40px;
+            border: 1px solid #e2eaf3;
+        } */
+         .footer-stats {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            /* 以下為原有樣式，保留不變 */
+            margin-top: 28px;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 28px;
+            flex-wrap: wrap;
+            background: #f8faff;
+            padding: 16px 24px;
+            border-radius: 40px;
+            border: 1px solid #e2eaf3;
+            /* 新增陰影強化視覺分層 */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+        }
+        .stats-item {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .stats-label {
+            color: #2b4058;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        .stats-value {
+            font-weight: 700;
+            font-size: 1.3rem;
+            color: #003366;
+            letter-spacing: 0.3px;
+        }
+        .stats-value small {
+            font-weight: 400;
+            font-size: 0.8rem;
+            color: #3f6280;
+            margin-left: 4px;
+        }
+        .reset-btn {
+            background: #eef3f9;
+            border: none;
+            padding: 8px 22px;
+            border-radius: 30px;
+            font-weight: 500;
+            color: #1f4462;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.9rem;
+            border: 1px solid transparent;
+        }
+        .reset-btn:hover {
+            background: #dce6f2;
+            border-color: #b6cbdf;
+            color: #0c2942;
+        }
+        .reset-btn:active {
+            background: #c8d7e9;
+        }
+        .note {
+            font-size: 0.8rem;
+            color: #5b6f86;
+            background: #edf3fa;
+            padding: 2px 12px;
+            border-radius: 30px;
+        }
+        @media (max-width: 600px) {
+            .app-container { padding: 16px; }
+            h1 { font-size: 1.5rem; }
+            .input-qty { width: 68px; padding: 8px 4px; }
+            .footer-stats { flex-direction: column; align-items: stretch; gap: 12px; }
+        }
+    </style>
+</head>
+<body>
+<div class="app-container">
+    <header>
+        <h1>📦 凍品重量計算器</h1>
+        <div class="subhead">
+            <span>⚡ 填入箱數即時計算總重量</span>
+            <span class="note">每箱重量 (kg) 已內建</span>
+        </div>
+    </header>
+     <div class="footer-stats">
+        <div class="stats-item" style="display:none;">
+            <span class="stats-label">📊 總箱數</span>
+            <span class="stats-value" id="totalBoxes">0</span>
+        </div>
+        <div class="stats-item">
+            <span class="stats-label">⚖️ 總重量</span>
+            <span class="stats-value" id="totalWeight">0.00 <small>kg</small></span>
+        </div>
+        <button class="reset-btn" id="resetBtn">⟳ 全部歸零</button>
+    </div>
+    <div class="table-responsive">
+        <table id="productTable">
+            <thead>
+                <tr>
+                    <th>品名</th>
+                    <th>每箱重量 (kg)</th>
+                    <th>箱數 (輸入)</th>
+                    <th>總重量 (kg)</th>
+                    <th>備註</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <!-- 由 JavaScript 動態生成 -->
+            </tbody>
+        </table>
+    </div>
+
+   
+</div>
+
+<script>
+    (function() {
+        // ----- 數據源 -----
+        const productData = [
+            { name: "五豐富春包子", weightPerBox: 8.35, note: "2箱打1箱" },
+            { name: "爆漿糍粑", weightPerBox: 4.5, note: "4箱打1箱" },
+            { name: "水晶肉", weightPerBox: 32, note: "100包/箱" },
+            { name: "老大昌20盒", weightPerBox: 19, note: "20盒/箱" },
+            { name: "爆浆糍粑", weightPerBox: 4.5, note: "4箱打1箱" },
+            { name: "黄糖糍粑", weightPerBox: 7.6, note: "" },
+            { name: "鴨餅100包", weightPerBox: 23, note: "3箱打2箱" },
+            { name: "維揚干絲(切絲)", weightPerBox: 17.3, note: "50包/箱" },
+            { name: "潼關饼", weightPerBox: 11.0, note: "2箱打1箱" },
+            { name: "臭豆腐", weightPerBox: 15.0, note: "48盒/箱" },
+            { name: "甲天下小丸子", weightPerBox: 11, note: "" },
+            { name: "東泉玉米糕/紅棗糕", weightPerBox: 8.0, note: "" },
+            { name: "東北燒雞(填隻數)", weightPerBox: 0.7, note: "" },
+            { name: "鹽水鴨", weightPerBox: 6.0, note: "2箱打1箱" },
+            { name: "山東小饅頭", weightPerBox: 11.3, note: "" },
+            { name: "椰汁黃金糕", weightPerBox: 8.25, note: "" },
+            { name: "白豆腐乾(填包數)", weightPerBox: 0.26, note: "" },
+            { name: "小米糕", weightPerBox: 10.0, note: "" },
+            { name: "開洋小蝦米500g", weightPerBox: 0.5, note: "" },
+            { name: "厚百葉3KG", weightPerBox: 3, note: "" },
+            { name: "海霸王蛋餃", weightPerBox: 11, note: "" },          
+            { name: "其他雜貨(填大約KG)", weightPerBox: 1, note: "" }        
+
+        ];
+
+        // ----- 獲取 DOM 元素 -----
+        const tbody = document.getElementById('tableBody');
+        const totalBoxesSpan = document.getElementById('totalBoxes');
+        const totalWeightSpan = document.getElementById('totalWeight');
+        const resetBtn = document.getElementById('resetBtn');
+
+        // 儲存所有輸入框的引用 (便於更新總計)
+        let qtyInputs = [];
+
+        // ----- 渲染表格 -----
+        function renderTable() {
+            tbody.innerHTML = '';
+            qtyInputs = [];
+
+            productData.forEach((item, index) => {
+                const tr = document.createElement('tr');
+
+                // 品名
+                const tdName = document.createElement('td');
+                tdName.className = 'col-item';
+                tdName.textContent = item.name;
+
+                // 每箱重量
+                const tdWeight = document.createElement('td');
+                tdWeight.className = 'col-weight';
+                tdWeight.textContent = item.weightPerBox.toFixed(2);
+
+                // 箱數輸入
+                const tdQty = document.createElement('td');
+                const input = document.createElement('input');
+                input.type = 'number';
+                input.min = 0;
+                input.step = 1;
+                input.value = 0;
+                input.className = 'input-qty';
+                input.dataset.index = index;
+                input.dataset.weight = item.weightPerBox;
+                tdQty.appendChild(input);
+                qtyInputs.push(input);
+
+                // 總重量 (顯示)
+                const tdTotal = document.createElement('td');
+                tdTotal.className = 'total-cell';
+                tdTotal.textContent = '0.00';
+                tdTotal.dataset.index = index;
+
+                // 備註
+                const tdNote = document.createElement('td');
+                tdNote.className = 'col-note';
+                tdNote.textContent = item.note || '—';
+
+                tr.appendChild(tdName);
+                tr.appendChild(tdWeight);
+                tr.appendChild(tdQty);
+                tr.appendChild(tdTotal);
+                tr.appendChild(tdNote);
+                tbody.appendChild(tr);
+            });
+
+            // 綁定輸入事件
+            qtyInputs.forEach(input => {
+                input.addEventListener('input', function(e) {
+                    const idx = parseInt(this.dataset.index);
+                    updateRowTotal(idx);
+                    updateFooterTotals();
+                });
+                // 支援 focus 時全選 (方便快速輸入)
+                input.addEventListener('focus', function() {
+                    this.select();
+                });
+            });
+
+            // 初始計算
+            updateFooterTotals();
+        }
+
+        // ----- 更新單行總重量 -----
+        function updateRowTotal(index) {
+            const input = qtyInputs[index];
+            if (!input) return;
+            const qty = parseFloat(input.value) || 0;
+            const weight = parseFloat(input.dataset.weight) || 0;
+            const total = qty * weight;
+
+            // 找到該行 total cell (tr 中第4個 td)
+            const tr = input.closest('tr');
+            if (!tr) return;
+            const tds = tr.querySelectorAll('td');
+            if (tds.length >= 4) {
+                const totalCell = tds[3]; // 第四欄
+                totalCell.textContent = total.toFixed(2);
+            }
+        }
+
+        // ----- 更新底部總箱數 & 總重量 -----
+        function updateFooterTotals() {
+            let totalBoxes = 0;
+            let totalWeight = 0;
+
+            qtyInputs.forEach(input => {
+                const qty = parseFloat(input.value) || 0;
+                const weight = parseFloat(input.dataset.weight) || 0;
+                totalBoxes += qty;
+                totalWeight += qty * weight;
+            });
+
+            totalBoxesSpan.textContent = totalBoxes;
+            totalWeightSpan.innerHTML = totalWeight.toFixed(2) + ' <small>kg</small>';
+        }
+
+        // ----- 重置全部箱數為 0 -----
+        function resetAllQty() {
+            qtyInputs.forEach(input => {
+                input.value = 0;
+                const idx = parseInt(input.dataset.index);
+                updateRowTotal(idx);
+            });
+            updateFooterTotals();
+        }
+
+        
+        // 初始化
+        renderTable();
+
+        // 重置按鈕監聽
+        resetBtn.addEventListener('click', resetAllQty);
+
+        // (可選) 暴露資料給開發者控制台除錯
+        window.__app = { productData, qtyInputs, resetAllQty, updateFooterTotals };
+    })();
+</script>
+</body>
+</html>
