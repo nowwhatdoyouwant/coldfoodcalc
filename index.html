@@ -177,9 +177,9 @@
             justify-content: flex-end;
             align-items: center;
             gap: 28px;
-            flex-wrap: wrap;
+            flex-wrap: nowrap;
             background: #f8faff;
-            padding: 16px 24px;
+            padding: 16px 15px;
             border-radius: 40px;
             border: 1px solid #e2eaf3;
             /* 新增陰影強化視覺分層 */
@@ -257,7 +257,7 @@
             width:65px;
         }
         .col-weight {
-            width:20px;
+            width:15px;
         }
         
         .col-note {
@@ -268,7 +268,7 @@
             text-overflow: ellipsis; /* 過長備註顯示... */
         }
         .total-cell{
-            width:40px;
+            width:70px;
         }
         .input-qty {
             width: 60px; /* 手機上輸入框更窄 */
@@ -382,6 +382,7 @@
                 input.className = 'input-qty';
                 input.dataset.index = index;
                 input.dataset.weight = item.weightPerBox;
+                input.pattern = "\d*"
                 tdQty.appendChild(input);
                 qtyInputs.push(input);
 
